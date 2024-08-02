@@ -1,3 +1,4 @@
+/* CSS per il gioco degli scacchi */
 #gameboard {
   width: 320px;
   height: 320px;
@@ -10,24 +11,29 @@
   height: 40px;
 }
 
+/* Dimensione dei pezzi degli scacchi */
 .square svg {
   height: 30px;
   width: 30px;
   margin: 5px;
 }
 
+/* Colore delle caselle chiare */
 .beige {
-  background-color: rgb(110, 110, 98);
+  background-color: #F0D9B5;
 }
 
+/* Colore delle caselle scure */
 .brown {
-  background-color: rgb(169, 43, 43);
+  background-color: #B58863;
 }
 
+/* Colore dei pezzi neri */
 .black {
   fill: black;
 }
 
+/* Colore dei pezzi bianchi */
 .white {
-  fill: white
+  fill: white;
 }
