@@ -23,6 +23,7 @@ function createBoard() {
     const square = document.createElement('div');
     square.classList.add('square');
     square.innerHTML = startPiece; // Inserisce il pezzo nella casella
+    square.firstChild && square.firstChild.setAttribute('draggable', true)
     square.setAttribute('square-id', i); // Imposta un attributo con l'indice della casella
 
     // Determina il colore della casella basandosi sulla posizione
@@ -48,3 +49,18 @@ function createBoard() {
 
 // Crea la scacchiera all'avvio
 createBoard();
+
+
+const allSquare = document.querySelectorAll('#gameboard .square');
+
+allSquare.forEach(square => {
+  square.addEventListener('dragstart', dragStart);
+})
+
+let startPositionId;
+let draggerdElement;
+
+function dragStart(e) {
+  startPositionId = e.target.parentNode.getAttribute('square-id');
+  draggerdElement = e.target;
+}
