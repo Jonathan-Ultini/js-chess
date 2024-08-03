@@ -9,6 +9,7 @@
 .square {
   width: 40px;
   height: 40px;
+  position: relative;
 }
 
 /* Dimensione dei pezzi degli scacchi */
@@ -16,6 +17,18 @@
   height: 30px;
   width: 30px;
   margin: 5px;
+  position: relative;
+  z-index: -9;
+}
+
+path {
+  position: relative;
+  z-index: -10;
+}
+
+.piece {
+  position: relative;
+  z-index: 9;
 }
 
 /* Colore delle caselle chiare */

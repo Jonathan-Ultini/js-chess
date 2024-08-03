@@ -55,12 +55,26 @@ const allSquare = document.querySelectorAll('#gameboard .square');
 
 allSquare.forEach(square => {
   square.addEventListener('dragstart', dragStart);
+  square.addEventListener('dragover', dragOver);
+  square.addEventListener('drop', dragDrop);
 })
 
 let startPositionId;
-let draggerdElement;
+let draggedElement;
 
 function dragStart(e) {
   startPositionId = e.target.parentNode.getAttribute('square-id');
-  draggerdElement = e.target;
+  draggedElement = e.target;
+}
+
+function dragOver(e) {
+  e.preventDefault();
+}
+
+function dragDrop(e) {
+  e.stopPropagation();
+
+  e.target.parentNode.append(draggedElement);
+  //e.target.append(draggedElement);
+  e.target.remove();
 }
