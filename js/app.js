@@ -5,6 +5,9 @@ const infoDisplay = document.querySelector("#info-display");
 
 const width = 8; // Larghezza della scacchiera
 
+let playerGo = 'black';
+playerDisplay.textContent = 'black';
+
 // Array con la disposizione iniziale dei pezzi sulla scacchiera
 const startPieces = [
   rook, knight, bishop, queen, king, bishop, knight, rook,
@@ -51,7 +54,7 @@ function createBoard() {
 createBoard();
 
 
-const allSquare = document.querySelectorAll('#gameboard .square');
+const allSquare = document.querySelectorAll('.square');
 
 allSquare.forEach(square => {
   square.addEventListener('dragstart', dragStart);
@@ -73,8 +76,28 @@ function dragOver(e) {
 
 function dragDrop(e) {
   e.stopPropagation();
+  console.log(e.target);
+  const taken = e.target.classList.contains('piece');
 
-  e.target.parentNode.append(draggedElement);
+  //e.target.parentNode.append(draggedElement);
   //e.target.append(draggedElement);
-  e.target.remove();
+  //e.target.remove();
+
+  changeplayer();
+}
+
+function changeplayer() {
+  if (playerGo === "black") {
+    playerGo = "white";
+    playerDisplay.textContent = 'white';
+  } else {
+    playerGo = "black"
+    playerDisplay.textContent = 'black';
+
+  }
+}
+
+function reverseIds() {
+  const allSquares = document.querySelectorAll(".square");
+
 }
