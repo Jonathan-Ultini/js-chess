@@ -26,6 +26,7 @@ path {
   z-index: -10;
 }
 
+/*mette il pezzo sempre prima in hover*/
 .piece {
   position: relative;
   z-index: 9;
