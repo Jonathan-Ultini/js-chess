@@ -1,4 +1,4 @@
-// Selezione degli elementi del DOM
+//#: Selezione degli elementi del DOM
 const gameBoard = document.querySelector("#gameboard"); // Scacchiera
 const playerDisplay = document.querySelector("#player"); // Giocatore corrente
 const infoDisplay = document.querySelector("#info-display"); // Info aggiuntive
@@ -8,7 +8,7 @@ const width = 8; // Larghezza della scacchiera (8 caselle)
 let playerGo = 'black'; // Turno iniziale del nero
 playerDisplay.textContent = 'black'; // Visualizza "black"
 
-// Disposizione iniziale dei pezzi sulla scacchiera
+//#: Disposizione iniziale dei pezzi sulla scacchiera
 const startPieces = [
   rook, knight, bishop, queen, king, bishop, knight, rook,
   pawn, pawn, pawn, pawn, pawn, pawn, pawn, pawn,
@@ -20,7 +20,7 @@ const startPieces = [
   rook, knight, bishop, queen, king, bishop, knight, rook
 ];
 
-// Crea la scacchiera
+//#: Crea la scacchiera
 function createBoard() {
   startPieces.forEach((startPiece, i) => {
     const square = document.createElement('div'); // Crea una casella
@@ -43,7 +43,7 @@ function createBoard() {
 
 createBoard(); // Crea la scacchiera all'avvio
 
-// Event listener per il drag and drop
+// #:Event listener per il drag and drop
 const allSquares = document.querySelectorAll('.square');
 allSquares.forEach(square => {
   square.addEventListener('dragstart', dragStart);
@@ -54,18 +54,18 @@ allSquares.forEach(square => {
 let startPositionId; // Posizione iniziale del pezzo trascinato
 let draggedElement; // Elemento trascinato
 
-// Inizio del trascinamento
+//#: Inizio del trascinamento
 function dragStart(e) {
   startPositionId = e.target.parentNode.getAttribute('square-id');
   draggedElement = e.target;
 }
 
-// Trascinamento sopra una casella
+//#: Trascinamento sopra una casella
 function dragOver(e) {
   e.preventDefault();
 }
 
-// Rilascio del pezzo trascinato
+//#: Rilascio del pezzo trascinato
 function dragDrop(e) {
   e.stopPropagation();
 
@@ -98,7 +98,7 @@ function dragDrop(e) {
 }
 
 
-// Cambia il turno del giocatore
+//#: Cambia il turno del giocatore
 function changeplayer() {
   if (playerGo === "black") {
     reverseIds(); // Inverte gli ID delle caselle
@@ -111,7 +111,7 @@ function changeplayer() {
   }
 }
 
-// Inverte gli ID delle caselle
+//#: Inverte gli ID delle caselle
 function reverseIds() {
   const allSquares = document.querySelectorAll(".square");
   allSquares.forEach((square, i) =>
@@ -119,7 +119,7 @@ function reverseIds() {
   );
 }
 
-// Ripristina gli ID originali delle caselle
+//#: Ripristina gli ID originali delle caselle
 function revertIds() {
   const allSquares = document.querySelectorAll(".square");
   allSquares.forEach((square, i) =>
@@ -128,7 +128,7 @@ function revertIds() {
 }
 
 
-// Funzione per verificare se il movimento del pezzo è valido
+//#: Funzione per verificare se il movimento del pezzo è valido
 function checkIfValid(target) {
   // Ottieni l'ID della casella di destinazione (dal target o dal suo nodo padre)
   const targetId = Number(target.getAttribute('square-id')) || Number(target.parentNode.getAttribute('square-id'));
@@ -143,4 +143,30 @@ function checkIfValid(target) {
   console.log('startId', startId);
   console.log('targetId', targetId);
   console.log('piece', piece);
+
+  // Verifica la validità del movimento in base al tipo di pezzo
+  switch (piece) {
+    case 'pawn':
+      // Righe di partenza dei pedoni neri
+      const starterRow = [8, 9, 10, 11, 12, 13, 14, 15];
+
+      // Condizioni per un movimento valido del pedone
+      if (
+        // Movimento iniziale di due caselle in avanti
+        (starterRow.includes(startId) && startId + width * 2 === targetId) ||
+        // Movimento di una casella in avanti
+        (startId + width === targetId) ||
+        // Movimento diagonale per catturare un pezzo
+        (startId + width - 1 === targetId && document.querySelector(`[square-id="${startId + width - 1}"]`).firstChild) ||
+        (startId + width + 1 === targetId && document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild)
+      ) {
+        return true;
+      }
+      break;
+
+  }
+
+  // Ritorna false se il movimento non è valido
+  return false;
 }
+
