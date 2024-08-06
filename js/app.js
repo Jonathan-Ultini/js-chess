@@ -68,18 +68,35 @@ function dragOver(e) {
 // Rilascio del pezzo trascinato
 function dragDrop(e) {
   e.stopPropagation();
-  console.log(e.target);
 
-  // Verifica se la casella contiene già un pezzo
-  const taken = e.target.classList.contains('piece');
+  const correctGo = draggedElement.firstChild.classList.contains(playerGo); // Verifica se il pezzo appartiene al giocatore attivo
+  const taken = e.target.classList.contains('piece'); // Verifica se la casella contiene già un pezzo
+  const valid = checkIfValid(e.target); // Verifica se il movimento è valido
+  const opponentGo = playerGo === 'white' ? 'black' : 'white'; // Determina il colore dell'avversario
+  const takenByOpponent = e.target.firstChild?.classList.contains(opponentGo); // Verifica se la casella è occupata da un pezzo avversario
 
-  // Azioni sul pezzo trascinato (commentato per evitare bug)
-  // e.target.parentNode.append(draggedElement);
-  // e.target.append(draggedElement);
-  // e.target.remove();
+  if (correctGo) { // Se il pezzo appartiene al giocatore attivo
+    if (takenByOpponent && valid) { // Se la casella è occupata dall'avversario e il movimento è valido
+      e.target.parentNode.append(draggedElement); // Sposta il pezzo trascinato nella nuova posizione
+      e.target.remove(); // Rimuove il pezzo avversario
+      changeplayer(); // Cambia il turno del giocatore
+      return;
+    }
+    if (taken && takenByOpponent) { // Se la casella è occupata dall'avversario ma il movimento non è valido
+      infoDisplay.textContent = "Non puoi muoverti lì"; // Mostra un messaggio di errore
+      setTimeout(() => infoDisplay.textContent = "", 2000); // Rimuove il messaggio dopo 2 secondi
+      return;
+    }
+    if (valid) { // Se il movimento è valido e la casella è vuota
+      e.target.append(draggedElement); // Sposta il pezzo trascinato nella nuova posizione
+      changeplayer(); // Cambia il turno del giocatore
+      return;
+    }
+  }
 
-  changeplayer(); // Cambia il giocatore attivo
+  changeplayer(); // Cambia il turno del giocatore (default)
 }
+
 
 // Cambia il turno del giocatore
 function changeplayer() {
@@ -108,4 +125,22 @@ function revertIds() {
   allSquares.forEach((square, i) =>
     square.setAttribute('square-id', i)
   );
+}
+
+
+// Funzione per verificare se il movimento del pezzo è valido
+function checkIfValid(target) {
+  // Ottieni l'ID della casella di destinazione (dal target o dal suo nodo padre)
+  const targetId = Number(target.getAttribute('square-id')) || Number(target.parentNode.getAttribute('square-id'));
+
+  // Ottieni l'ID della casella di partenza
+  const startId = Number(startPositionId);
+
+  // Ottieni l'ID del pezzo trascinato
+  const piece = draggedElement.id;
+
+  // Stampa i dettagli nel console log per il debug
+  console.log('startId', startId);
+  console.log('targetId', targetId);
+  console.log('piece', piece);
 }
