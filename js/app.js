@@ -164,6 +164,21 @@ function checkIfValid(target) {
       }
       break;
 
+    case 'knight':
+      // Condizioni per un movimento valido del cavallo
+      if (
+        startId + width * 2 + 1 === targetId || // Movimento a "L" verso destra in avanti
+        startId + width * 2 - 1 === targetId || // Movimento a "L" verso sinistra in avanti
+        startId + 2 + width === targetId ||     // Movimento a "L" verso destra lateralmente in avanti
+        startId - 2 + width === targetId ||     // Movimento a "L" verso sinistra lateralmente in avanti
+        startId - width * 2 + 1 === targetId || // Movimento a "L" verso destra indietro
+        startId - width * 2 - 1 === targetId || // Movimento a "L" verso sinistra indietro
+        startId - 2 - width === targetId ||     // Movimento a "L" verso sinistra lateralmente indietro
+        startId + 2 - width === targetId        // Movimento a "L" verso destra lateralmente indietro
+      ) {
+        return true;
+      }
+      break;
   }
 
   // Ritorna false se il movimento non è valido
