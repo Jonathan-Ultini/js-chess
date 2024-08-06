@@ -1,116 +1,111 @@
 // Selezione degli elementi del DOM
-const gameBoard = document.querySelector("#gameboard"); // Seleziona l'elemento con id "gameboard" che rappresenta la scacchiera
-const playerDisplay = document.querySelector("#player"); // Seleziona l'elemento con id "player" che mostra il giocatore corrente
-const infoDisplay = document.querySelector("#info-display"); // Seleziona l'elemento con id "info-display" per mostrare informazioni aggiuntive
+const gameBoard = document.querySelector("#gameboard"); // Scacchiera
+const playerDisplay = document.querySelector("#player"); // Giocatore corrente
+const infoDisplay = document.querySelector("#info-display"); // Info aggiuntive
 
 const width = 8; // Larghezza della scacchiera (8 caselle)
 
-let playerGo = 'black'; // Inizializza il turno del giocatore al nero
-playerDisplay.textContent = 'black'; // Imposta il testo dell'elemento playerDisplay su "black"
+let playerGo = 'black'; // Turno iniziale del nero
+playerDisplay.textContent = 'black'; // Visualizza "black"
 
-// Array con la disposizione iniziale dei pezzi sulla scacchiera
+// Disposizione iniziale dei pezzi sulla scacchiera
 const startPieces = [
-  rook, knight, bishop, queen, king, bishop, knight, rook, // Pezzi della prima riga (nero)
-  pawn, pawn, pawn, pawn, pawn, pawn, pawn, pawn, // Pedoni della seconda riga (nero)
-  '', '', '', '', '', '', '', '', // Righe vuote nel mezzo
-  '', '', '', '', '', '', '', '', // Righe vuote nel mezzo
-  '', '', '', '', '', '', '', '', // Righe vuote nel mezzo
-  '', '', '', '', '', '', '', '', // Righe vuote nel mezzo
-  pawn, pawn, pawn, pawn, pawn, pawn, pawn, pawn, // Pedoni della settima riga (bianco)
-  rook, knight, bishop, queen, king, bishop, knight, rook // Pezzi dell'ottava riga (bianco)
+  rook, knight, bishop, queen, king, bishop, knight, rook,
+  pawn, pawn, pawn, pawn, pawn, pawn, pawn, pawn,
+  '', '', '', '', '', '', '', '',
+  '', '', '', '', '', '', '', '',
+  '', '', '', '', '', '', '', '',
+  '', '', '', '', '', '', '', '',
+  pawn, pawn, pawn, pawn, pawn, pawn, pawn, pawn,
+  rook, knight, bishop, queen, king, bishop, knight, rook
 ];
 
-// Funzione per creare la scacchiera
+// Crea la scacchiera
 function createBoard() {
-  startPieces.forEach((startPiece, i) => { // Itera su ogni pezzo nella disposizione iniziale
-    const square = document.createElement('div'); // Crea un nuovo div per la casella
-    square.classList.add('square'); // Aggiunge la classe "square" alla casella
-    square.innerHTML = startPiece; // Inserisce il pezzo nella casella (HTML)
-    square.firstChild && square.firstChild.setAttribute('draggable', true); // Rende il pezzo trascinabile se esiste
-    square.setAttribute('square-id', i); // Imposta un attributo con l'indice della casella
+  startPieces.forEach((startPiece, i) => {
+    const square = document.createElement('div'); // Crea una casella
+    square.classList.add('square'); // Aggiunge la classe "square"
+    square.innerHTML = startPiece; // Inserisce il pezzo
+    if (square.firstChild) square.firstChild.setAttribute('draggable', true); // Rende il pezzo trascinabile
+    square.setAttribute('square-id', i); // Imposta l'ID della casella
 
-    // Determina il colore della casella basandosi sulla posizione
-    const row = Math.floor((63 - i) / 8) + 1; // Calcola la riga della casella
-    if (row % 2 === 0) { // Se la riga è pari
-      square.classList.add(i % 2 === 0 ? "beige" : "brown"); // Alterna i colori delle caselle (beige/marrone)
-    } else { // Se la riga è dispari
-      square.classList.add(i % 2 === 0 ? "brown" : "beige"); // Alterna i colori delle caselle (marrone/beige)
-    }
+    // Determina il colore della casella
+    const row = Math.floor((63 - i) / 8) + 1;
+    square.classList.add(row % 2 === 0 ? (i % 2 === 0 ? "beige" : "brown") : (i % 2 === 0 ? "brown" : "beige"));
 
-    // Imposta il colore del pezzo in base alla posizione iniziale
-    if (i <= 15) { // Prime due righe (pezzi neri)
-      square.firstChild.firstChild.classList.add('black');
-    }
-    if (i >= 48) { // Ultime due righe (pezzi bianchi)
-      square.firstChild.firstChild.classList.add('white');
-    }
+    // Imposta il colore del pezzo
+    if (i <= 15) square.firstChild.firstChild.classList.add('black'); // Pezzi neri
+    if (i >= 48) square.firstChild.firstChild.classList.add('white'); // Pezzi bianchi
 
-    // Aggiunge la casella alla scacchiera
-    gameBoard.append(square);
+    gameBoard.append(square); // Aggiunge la casella alla scacchiera
   });
 }
 
-// Crea la scacchiera all'avvio
-createBoard();
+createBoard(); // Crea la scacchiera all'avvio
 
-// Seleziona tutte le caselle della scacchiera
-const allSquare = document.querySelectorAll('.square');
-
-// Aggiunge gli event listener per il drag and drop a ogni casella
-allSquare.forEach(square => {
-  square.addEventListener('dragstart', dragStart); // Inizia il trascinamento
-  square.addEventListener('dragover', dragOver); // Trascinamento sopra una casella
-  square.addEventListener('drop', dragDrop); // Rilascio su una casella
+// Event listener per il drag and drop
+const allSquares = document.querySelectorAll('.square');
+allSquares.forEach(square => {
+  square.addEventListener('dragstart', dragStart);
+  square.addEventListener('dragover', dragOver);
+  square.addEventListener('drop', dragDrop);
 });
 
-// Variabili per tenere traccia della posizione iniziale e dell'elemento trascinato
-let startPositionId;
-let draggedElement;
+let startPositionId; // Posizione iniziale del pezzo trascinato
+let draggedElement; // Elemento trascinato
 
-// Funzione per gestire l'inizio del trascinamento
+// Inizio del trascinamento
 function dragStart(e) {
-  startPositionId = e.target.parentNode.getAttribute('square-id'); // Salva l'ID della posizione iniziale
-  draggedElement = e.target; // Salva l'elemento trascinato
+  startPositionId = e.target.parentNode.getAttribute('square-id');
+  draggedElement = e.target;
 }
 
-// Funzione per gestire il trascinamento sopra una casella
+// Trascinamento sopra una casella
 function dragOver(e) {
-  e.preventDefault(); // Previene l'azione predefinita per permettere il drop
+  e.preventDefault();
 }
 
-// Funzione per gestire il rilascio dell'elemento trascinato
+// Rilascio del pezzo trascinato
 function dragDrop(e) {
-  e.stopPropagation(); // Impedisce la propagazione dell'evento
-  console.log(e.target); // Stampa nel console log l'elemento target dell'evento
+  e.stopPropagation();
+  console.log(e.target);
 
-  // Controlla se l'elemento target ha la classe 'piece', indicando che è un pezzo degli scacchi
+  // Verifica se la casella contiene già un pezzo
   const taken = e.target.classList.contains('piece');
 
-  // Sposta l'elemento trascinato (draggedElement) nel nodo padre del target
-  e.target.parentNode.append(draggedElement);
+  // Azioni sul pezzo trascinato (commentato per evitare bug)
+  // e.target.parentNode.append(draggedElement);
+  // e.target.append(draggedElement);
+  // e.target.remove();
 
-  // Aggiunge l'elemento trascinato (draggedElement) all'elemento target
-  e.target.append(draggedElement);
-
-  // Rimuove l'elemento target (se è un pezzo preso)
-  e.target.remove();
-
-  // Cambia il giocatore attivo
-  changeplayer();
+  changeplayer(); // Cambia il giocatore attivo
 }
 
-// Funzione per cambiare il turno del giocatore
+// Cambia il turno del giocatore
 function changeplayer() {
-  if (playerGo === "black") { // Se il turno attuale è del nero
-    playerGo = "white"; // Cambia al bianco
-    playerDisplay.textContent = 'white'; // Aggiorna il display
-  } else { // Se il turno attuale è del bianco
-    playerGo = "black"; // Cambia al nero
-    playerDisplay.textContent = 'black'; // Aggiorna il display
+  if (playerGo === "black") {
+    reverseIds(); // Inverte gli ID delle caselle
+    playerGo = "white";
+    playerDisplay.textContent = 'white';
+  } else {
+    revertIds(); // Ripristina gli ID originali delle caselle
+    playerGo = "black";
+    playerDisplay.textContent = 'black';
   }
 }
 
-// Funzione dichiarata ma non implementata
+// Inverte gli ID delle caselle
 function reverseIds() {
-  const allSquares = document.querySelectorAll(".square"); // Seleziona tutte le caselle della scacchiera
+  const allSquares = document.querySelectorAll(".square");
+  allSquares.forEach((square, i) =>
+    square.setAttribute('square-id', (width * width - 1) - i)
+  );
+}
+
+// Ripristina gli ID originali delle caselle
+function revertIds() {
+  const allSquares = document.querySelectorAll(".square");
+  allSquares.forEach((square, i) =>
+    square.setAttribute('square-id', i)
+  );
 }
