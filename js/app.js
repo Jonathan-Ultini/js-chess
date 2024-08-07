@@ -79,6 +79,7 @@ function dragDrop(e) {
     if (takenByOpponent && valid) { // Se la casella è occupata dall'avversario e il movimento è valido
       e.target.parentNode.append(draggedElement); // Sposta il pezzo trascinato nella nuova posizione
       e.target.remove(); // Rimuove il pezzo avversario
+      checkForWin(); // controllo vittoria
       changeplayer(); // Cambia il turno del giocatore
       return;
     }
@@ -89,6 +90,7 @@ function dragDrop(e) {
     }
     if (valid) { // Se il movimento è valido e la casella è vuota
       e.target.append(draggedElement); // Sposta il pezzo trascinato nella nuova posizione
+      checkForWin(); // controllo vittoria
       changeplayer(); // Cambia il turno del giocatore
       return;
     }
@@ -380,3 +382,31 @@ function checkIfValid(target) {
   return false;
 }
 
+//#: funzione per il controllo della vittoria
+function checkForWin() {
+  // Trova tutti gli elementi con l'ID 'king' (potrebbero essere 0, 1 o 2)
+  const kings = Array.from(document.querySelectorAll('[id^="king"]'));
+
+  // Debug: stampa l'elenco dei re trovati
+  console.log(kings);
+
+  // Controlla il numero di re trovati
+  if (kings.length < 2) {
+    // Determina il colore del re mancante
+    const whiteKing = kings.find(king => king.classList.contains('white'));
+    const blackKing = kings.find(king => king.classList.contains('black'));
+
+    if (!whiteKing) {
+      // Il re bianco è stato catturato, i neri vincono
+      console.log("Black wins!");
+      alert("Black wins!");
+    } else if (!blackKing) {
+      // Il re nero è stato catturato, i bianchi vincono
+      console.log("White wins!");
+      alert("White wins!");
+    }
+  } else {
+    // Entrambi i re sono ancora in gioco
+    console.log("Game continues, both kings are present.");
+  }
+}
