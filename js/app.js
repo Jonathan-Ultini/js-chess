@@ -148,40 +148,68 @@ function checkIfValid(target) {
   switch (piece) {
     //#: pawn
     case 'pawn': {
-      // Righe di partenza dei pedoni neri
-      const starterRow = [8, 9, 10, 11, 12, 13, 14, 15];
+      // Funzione di supporto per verificare se una mossa del pedone è valida
+      const isPawnMove = (start, target, pieceColor) => {
+        const direction = pieceColor === 'white' ? -1 : 1; // Determina la direzione del movimento in base al colore
+        const starterRow = pieceColor === 'white' ? [48, 49, 50, 51, 52, 53, 54, 55] : [8, 9, 10, 11, 12, 13, 14, 15];
 
-      // Condizioni per un movimento valido del pedone
-      if (
         // Movimento iniziale di due caselle in avanti
-        (starterRow.includes(startId) && startId + width * 2 === targetId) ||
+        if (starterRow.includes(start) && start + direction * width * 2 === target) {
+          return true;
+        }
+
         // Movimento di una casella in avanti
-        (startId + width === targetId) ||
+        if (start + direction * width === target) {
+          return true;
+        }
+
         // Movimento diagonale per catturare un pezzo
-        (startId + width - 1 === targetId && document.querySelector(`[square-id="${startId + width - 1}"]`).firstChild) ||
-        (startId + width + 1 === targetId && document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild)
-      ) {
+        if ((start + direction * width - 1 === target || start + direction * width + 1 === target) &&
+          document.querySelector(`[square-id="${target}"]`).firstChild) {
+          return true;
+        }
+
+        return false;
+      };
+
+      // Verifica se la mossa è valida
+      if (isPawnMove(startId, targetId, pieceColor)) {
         return true;
       }
       break;
     }
+
     //#: knight
     case 'knight': {
-      // Condizioni per un movimento valido del cavallo
-      if (
-        startId + width * 2 + 1 === targetId || // Movimento a "L" verso destra in avanti
-        startId + width * 2 - 1 === targetId || // Movimento a "L" verso sinistra in avanti
-        startId + 2 + width === targetId ||     // Movimento a "L" verso destra lateralmente in avanti
-        startId - 2 + width === targetId ||     // Movimento a "L" verso sinistra lateralmente in avanti
-        startId - width * 2 + 1 === targetId || // Movimento a "L" verso destra indietro
-        startId - width * 2 - 1 === targetId || // Movimento a "L" verso sinistra indietro
-        startId - 2 - width === targetId ||     // Movimento a "L" verso sinistra lateralmente indietro
-        startId + 2 - width === targetId        // Movimento a "L" verso destra lateralmente indietro
-      ) {
-        return true;
+      // Funzione di supporto per verificare se una mossa del cavallo è valida
+      const isKnightMove = (start, target) => {
+        // Possibili movimenti del cavallo in una scacchiera
+        const knightMoves = [
+          width * 2 + 1,
+          width * 2 - 1,
+          2 + width,
+          -2 + width,
+          -(width * 2) + 1,
+          -(width * 2) - 1,
+          -2 - width,
+          2 - width
+        ];
+
+        // Controlla se il movimento è tra quelli validi
+        return knightMoves.some(move => start + move === target);
+      };
+
+      // Verifica se la mossa è valida
+      if (isKnightMove(startId, targetId)) {
+        // Verifica se la casella di destinazione è vuota o contiene un pezzo avversario
+        const targetSquare = document.querySelector(`[square-id="${targetId}"]`);
+        if (!targetSquare || !targetSquare.firstChild || targetSquare.firstChild.getAttribute('color') !== pieceColor) {
+          return true;
+        }
       }
       break;
     }
+
     //#: bishop
     case 'bishop': {
       // Funzione di supporto per verificare se una mossa diagonale è valida
@@ -261,8 +289,91 @@ function checkIfValid(target) {
     }
     //#: queen
     case 'queen': {
+      // Funzione di supporto per verificare se una mossa diagonale è valida
+      const isDiagonalMove = (start, target, step) => {
+        for (let i = 1; i < width; i++) {
+          const nextSquareId = start + i * step;
+          if (nextSquareId === target) {
+            return true;
+          }
+          const nextSquare = document.querySelector(`[square-id="${nextSquareId}"]`);
+          if (!nextSquare || nextSquare.firstChild) {
+            return false;
+          }
+        }
+        return false;
+      };
 
+      // Funzione di supporto per verificare se una mossa rettilinea è valida
+      const isStraightMove = (start, target, step) => {
+        for (let i = 1; i < width; i++) {
+          const nextSquareId = start + i * step;
+          if (nextSquareId === target) {
+            return true;
+          }
+          const nextSquare = document.querySelector(`[square-id="${nextSquareId}"]`);
+          if (!nextSquare || nextSquare.firstChild) {
+            return false;
+          }
+        }
+        return false;
+      };
+
+      // Array dei possibili passi per le quattro direzioni diagonali
+      const diagonalSteps = [
+        width + 1,    // Diagonale avanti a destra
+        width - 1,    // Diagonale avanti a sinistra
+        -(width + 1), // Diagonale indietro a sinistra
+        -(width - 1)  // Diagonale indietro a destra
+      ];
+
+      // Array dei possibili passi per le quattro direzioni rettilinee
+      const straightSteps = [
+        width,   // Verticale verso il basso
+        -width,  // Verticale verso l'alto
+        1,       // Orizzontale verso destra
+        -1       // Orizzontale verso sinistra
+      ];
+
+      // Itera attraverso ogni direzione diagonale
+      for (const step of diagonalSteps) {
+        if (isDiagonalMove(startId, targetId, step)) {
+          return true;
+        }
+      }
+
+      // Itera attraverso ogni direzione rettilinea
+      for (const step of straightSteps) {
+        if (isStraightMove(startId, targetId, step)) {
+          return true;
+        }
+      }
+
+      break;
     }
+    //#: king
+    case 'king': {
+      // Funzione di supporto per verificare se una mossa del re è valida
+      const isKingMove = (start, target) => {
+        // Calcola la differenza di posizione tra la casella di partenza e quella di destinazione
+        const rowDiff = Math.abs(Math.floor(start / width) - Math.floor(target / width));
+        const colDiff = Math.abs((start % width) - (target % width));
+
+        // Il re può muoversi di una casella in qualsiasi direzione
+        return (rowDiff <= 1 && colDiff <= 1);
+      };
+
+      // Verifica se la mossa è valida
+      if (isKingMove(startId, targetId)) {
+        // Verifica se la casella di destinazione è vuota o contiene un pezzo avversario
+        const targetSquare = document.querySelector(`[square-id="${targetId}"]`);
+        if (!targetSquare || !targetSquare.firstChild || targetSquare.firstChild.getAttribute('color') !== pieceColor) {
+          return true;
+        }
+      }
+      break;
+    }
+
   }
 
   // Ritorna false se il movimento non è valido
