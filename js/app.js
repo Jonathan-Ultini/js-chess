@@ -146,7 +146,8 @@ function checkIfValid(target) {
 
   // Verifica la validità del movimento in base al tipo di pezzo
   switch (piece) {
-    case 'pawn':
+    //#: pawn
+    case 'pawn': {
       // Righe di partenza dei pedoni neri
       const starterRow = [8, 9, 10, 11, 12, 13, 14, 15];
 
@@ -163,8 +164,9 @@ function checkIfValid(target) {
         return true;
       }
       break;
-
-    case 'knight':
+    }
+    //#: knight
+    case 'knight': {
       // Condizioni per un movimento valido del cavallo
       if (
         startId + width * 2 + 1 === targetId || // Movimento a "L" verso destra in avanti
@@ -179,7 +181,8 @@ function checkIfValid(target) {
         return true;
       }
       break;
-
+    }
+    //#: bishop
     case 'bishop': {
       // Funzione di supporto per verificare se una mossa diagonale è valida
       const isDiagonalMove = (start, target, step) => {
@@ -217,7 +220,49 @@ function checkIfValid(target) {
       }
       break;
     }
+    //#: rook
+    case 'rook': {
+      // Funzione di supporto per verificare se una mossa rettilinea è valida
+      const isStraightMove = (start, target, step) => {
+        // Itera attraverso le caselle lungo la linea retta
+        for (let i = 1; i < width; i++) {
+          // Calcola l'ID della prossima casella lungo la linea retta
+          const nextSquareId = start + i * step;
+          // Se la prossima casella è la destinazione, la mossa è valida
+          if (nextSquareId === target) {
+            return true;
+          }
+          // Se la casella successiva non esiste o è occupata, interrompi il ciclo
+          const nextSquare = document.querySelector(`[square-id="${nextSquareId}"]`);
+          if (!nextSquare || nextSquare.firstChild) {
+            return false;
+          }
+        }
+        return false;
+      };
 
+      // Array dei possibili passi per le quattro direzioni rettilinee
+      const straightSteps = [
+        width,   // Verticale verso il basso
+        -width,  // Verticale verso l'alto
+        1,       // Orizzontale verso destra
+        -1       // Orizzontale verso sinistra
+      ];
+
+      // Itera attraverso ogni direzione rettilinea
+      for (const step of straightSteps) {
+        // Controlla se la mossa rettilinea è valida per la direzione corrente
+        if (isStraightMove(startId, targetId, step)) {
+          return true;
+        }
+      }
+      break;
+
+    }
+    //#: queen
+    case 'queen': {
+
+    }
   }
 
   // Ritorna false se il movimento non è valido
