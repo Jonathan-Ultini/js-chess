@@ -179,6 +179,45 @@ function checkIfValid(target) {
         return true;
       }
       break;
+
+    case 'bishop': {
+      // Funzione di supporto per verificare se una mossa diagonale è valida
+      const isDiagonalMove = (start, target, step) => {
+        // Itera attraverso le caselle lungo la diagonale
+        for (let i = 1; i < width; i++) {
+          // Calcola l'ID della prossima casella lungo la diagonale
+          const nextSquareId = start + i * step;
+          // Se la prossima casella è la destinazione, la mossa è valida
+          if (nextSquareId === target) {
+            return true;
+          }
+          // Se la casella successiva non esiste o è occupata, interrompi il ciclo
+          const nextSquare = document.querySelector(`[square-id="${nextSquareId}"]`);
+          if (!nextSquare || nextSquare.firstChild) {
+            return false;
+          }
+        }
+        return false;
+      };
+
+      // Array dei possibili passi per le quattro direzioni diagonali
+      const diagonalSteps = [
+        width + 1,   // Diagonale avanti a destra
+        width - 1,   // Diagonale avanti a sinistra
+        -(width + 1), // Diagonale indietro a sinistra
+        -(width - 1)  // Diagonale indietro a destra
+      ];
+
+      // Itera attraverso ogni direzione diagonale
+      for (const step of diagonalSteps) {
+        // Controlla se la mossa diagonale è valida per la direzione corrente
+        if (isDiagonalMove(startId, targetId, step)) {
+          return true;
+        }
+      }
+      break;
+    }
+
   }
 
   // Ritorna false se il movimento non è valido
