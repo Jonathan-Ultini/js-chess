@@ -1,21 +1,32 @@
 /* CSS per il gioco degli scacchi */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 #gameboard {
-  width: 320px;
-  height: 320px;
+  width: 480px;
+  height: 480px;
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
 .square {
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   position: relative;
 }
 
 /* Dimensione dei pezzi degli scacchi */
 .square svg {
-  height: 30px;
-  width: 30px;
+  height: 50px;
+  width: 50px;
   margin: 5px;
   position: relative;
   z-index: -9;
@@ -26,7 +37,7 @@ path {
   z-index: -10;
 }
 
-/*mette il pezzo sempre prima in hover*/
+/* mette il pezzo sempre prima in hover */
 .piece {
   position: relative;
   z-index: 9;
@@ -50,4 +61,11 @@ path {
 /* Colore dei pezzi bianchi */
 .white {
   fill: white;
+}
+
+/* Stili per i paragrafi */
+p {
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  margin: 0;
 }

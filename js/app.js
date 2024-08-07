@@ -69,6 +69,7 @@ function dragOver(e) {
 function dragDrop(e) {
   e.stopPropagation();
 
+  const pieceColor = draggedElement.firstChild.classList.contains('white') ? 'white' : 'black'; // Determina il colore del pezzo trascinato
   const correctGo = draggedElement.firstChild.classList.contains(playerGo); // Verifica se il pezzo appartiene al giocatore attivo
   const taken = e.target.classList.contains('piece'); // Verifica se la casella contiene già un pezzo
   const valid = checkIfValid(e.target); // Verifica se il movimento è valido
@@ -140,42 +141,32 @@ function checkIfValid(target) {
 
   // Ottieni l'ID del pezzo trascinato
   const piece = draggedElement.id;
+  const pieceColor = draggedElement.firstChild.classList.contains('white') ? 'white' : 'black'; // Determina il colore del pezzo trascinato
 
   // Stampa i dettagli nel console log per il debug
   console.log('startId', startId);
   console.log('targetId', targetId);
   console.log('piece', piece);
+  console.log('pieceColor', pieceColor);
 
   // Verifica la validità del movimento in base al tipo di pezzo
   switch (piece) {
     //#: pawn
     case 'pawn': {
-      // Funzione di supporto per verificare se una mossa del pedone è valida
-      const isPawnMove = (start, target, pieceColor) => {
-        const direction = pieceColor === 'white' ? -1 : 1; // Determina la direzione del movimento in base al colore
-        const starterRow = pieceColor === 'white' ? [48, 49, 50, 51, 52, 53, 54, 55] : [8, 9, 10, 11, 12, 13, 14, 15];
+      // Righe di partenza dei pedoni neri
+      const starterRow = [8, 9, 10, 11, 12, 13, 14, 15];
 
+      // Condizioni per un movimento valido del pedone
+      if (
         // Movimento iniziale di due caselle in avanti
-        if (starterRow.includes(start) && start + direction * width * 2 === target) {
-          return true;
-        }
-
+        (starterRow.includes(startId) && startId + width * 2 === targetId) ||
         // Movimento di una casella in avanti
-        if (start + direction * width === target) {
-          return true;
-        }
-
+        (startId + width === targetId) ||
         // Movimento diagonale per catturare un pezzo
-        if ((start + direction * width - 1 === target || start + direction * width + 1 === target) &&
-          document.querySelector(`[square-id="${target}"]`).firstChild) {
-          return true;
-        }
+        (startId + width - 1 === targetId && document.querySelector(`[square-id="${startId + width - 1}"]`)?.firstChild) ||
+        (startId + width + 1 === targetId && document.querySelector(`[square-id="${startId + width + 1}"]`)?.firstChild)
 
-        return false;
-      };
-
-      // Verifica se la mossa è valida
-      if (isPawnMove(startId, targetId, pieceColor)) {
+      ) {
         return true;
       }
       break;
