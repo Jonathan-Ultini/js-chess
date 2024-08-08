@@ -11,8 +11,17 @@
 
 <body>
 
-  <!-- Div che contiene la scacchiera -->
-  <div id="gameboard"></div>
+  <!-- Contenitore per i controlli e la scacchiera -->
+  <div id="game-container">
+    <!-- Div che contiene i pulsanti di controllo -->
+    <div id="controls">
+      <button id="reset-btn">Reset</button>
+      <!-- <button id="undo-btn">Undo</button> -->
+    </div>
+    <!-- Div che contiene la scacchiera -->
+    <div id="gameboard"></div>
+  </div>
+
   <!-- Paragrafo che mostra il giocatore corrente -->
   <p>It is <span id="player"></span>'s go.</p>
   <!-- Paragrafo per mostrare informazioni o messaggi -->
@@ -23,5 +32,7 @@
   <!-- Inclusione del file JS principale dell'applicazione -->
   <script src="js/app.js"></script>
 </body>
+
+
 
 </html>

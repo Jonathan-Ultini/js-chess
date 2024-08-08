@@ -22,6 +22,7 @@ const startPieces = [
 
 //#: Crea la scacchiera
 function createBoard() {
+  gameBoard.innerHTML = ''; // Pulisce la scacchiera
   startPieces.forEach((startPiece, i) => {
     const square = document.createElement('div'); // Crea una casella
     square.classList.add('square'); // Aggiunge la classe "square"
@@ -38,10 +39,31 @@ function createBoard() {
     if (i >= 48) square.firstChild.firstChild.classList.add('white'); // Pezzi bianchi
 
     gameBoard.append(square); // Aggiunge la casella alla scacchiera
+
+    // Riassegna gli event listeners per il drag-and-drop
+    const allSquares = document.querySelectorAll('.square');
+    allSquares.forEach(square => {
+      square.addEventListener('dragstart', dragStart);
+      square.addEventListener('dragover', dragOver);
+      square.addEventListener('drop', dragDrop);
+    });
   });
 }
 
 createBoard(); // Crea la scacchiera all'avvio
+
+// Funzione per resettare la scacchiera
+function resetBoard() {
+  createBoard(); // Ricrea la scacchiera
+
+  // Ripristina il turno iniziale
+  playerGo = 'black'; // Imposta il turno su "black"
+  playerDisplay.textContent = 'black'; // Aggiorna l'elemento della visualizzazione del turno
+  infoDisplay.textContent = ''; // Pulisce eventuali messaggi informativi
+}
+
+// Event listeners per i bottoni
+document.getElementById('reset-btn').addEventListener('click', resetBoard);
 
 //#: funzione per mostrare messaggio errore
 function showMessage(message) {
