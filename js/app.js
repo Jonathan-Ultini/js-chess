@@ -43,7 +43,19 @@ function createBoard() {
 
 createBoard(); // Crea la scacchiera all'avvio
 
-// #:Event listener per il drag and drop
+//#: funzione per mostrare messaggio errore
+function showMessage(message) {
+  const infoDisplay = document.getElementById('info-display');
+  infoDisplay.textContent = message;
+  infoDisplay.classList.add('show');
+
+  setTimeout(() => {
+    infoDisplay.classList.remove('show');
+  }, 2000);
+}
+
+
+// #: Event listener per il drag and drop
 const allSquares = document.querySelectorAll('.square');
 allSquares.forEach(square => {
   square.addEventListener('dragstart', dragStart);
@@ -76,30 +88,35 @@ function dragDrop(e) {
   const opponentGo = playerGo === 'white' ? 'black' : 'white'; // Determina il colore dell'avversario
   const takenByOpponent = e.target.firstChild?.classList.contains(opponentGo); // Verifica se la casella è occupata da un pezzo avversario
 
-  if (correctGo) { // Se il pezzo appartiene al giocatore attivo
-    if (takenByOpponent && valid) { // Se la casella è occupata dall'avversario e il movimento è valido
-      e.target.parentNode.append(draggedElement); // Sposta il pezzo trascinato nella nuova posizione
-      e.target.remove(); // Rimuove il pezzo avversario
-      checkForWin(); // controllo vittoria
-      changeplayer(); // Cambia il turno del giocatore
-      return;
-    }
-    if (taken && takenByOpponent) { // Se la casella è occupata dall'avversario ma il movimento non è valido
-      infoDisplay.textContent = "Non puoi muoverti lì"; // Mostra un messaggio di errore
-      setTimeout(() => infoDisplay.textContent = "", 2000); // Rimuove il messaggio dopo 2 secondi
-      return;
-    }
-    if (valid) { // Se il movimento è valido e la casella è vuota
-      e.target.append(draggedElement); // Sposta il pezzo trascinato nella nuova posizione
-      checkForWin(); // controllo vittoria
-      changeplayer(); // Cambia il turno del giocatore
-      return;
-    }
+  // Quando il giocatore sbaglia turno, usa showMessage per mostrare l'avviso
+  if (!correctGo) {
+    showMessage("Non è il tuo turno!");
+    return;
   }
 
-  changeplayer(); // Cambia il turno del giocatore (default)
-}
+  if (takenByOpponent && valid) { // Se la casella è occupata dall'avversario e il movimento è valido
+    e.target.parentNode.append(draggedElement); // Sposta il pezzo trascinato nella nuova posizione
+    e.target.remove(); // Rimuove il pezzo avversario
+    checkForWin(); // controllo vittoria
+    changeplayer(); // Cambia il turno del giocatore
+    return;
+  }
 
+  if (taken && !takenByOpponent) { // Se la casella è occupata dal proprio pezzo
+    showMessage("Non puoi muoverti lì!")
+    return;
+  }
+
+  if (valid) { // Se il movimento è valido e la casella è vuota
+    e.target.append(draggedElement); // Sposta il pezzo trascinato nella nuova posizione
+    checkForWin(); // controllo vittoria
+    changeplayer(); // Cambia il turno del giocatore
+    return;
+  }
+
+  // Se la mossa non è valida, non cambiare turno
+  showMessage("Mossa non valida!")
+}
 
 //#: Cambia il turno del giocatore
 function changeplayer() {
@@ -129,6 +146,7 @@ function revertIds() {
     square.setAttribute('square-id', i)
   );
 }
+
 
 
 //#: Funzione per verificare se il movimento del pezzo è valido
@@ -401,3 +419,4 @@ function checkForWin() {
     console.log("Game continues, both kings are present.");
   }
 }
+
