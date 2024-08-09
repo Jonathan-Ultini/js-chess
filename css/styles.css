@@ -23,6 +23,7 @@ body {
   width: 60px;
   height: 60px;
   position: relative;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 /* Dimensione dei pezzi degli scacchi */

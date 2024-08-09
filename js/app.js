@@ -197,20 +197,21 @@ function checkIfValid(target) {
       const starterRow = [8, 9, 10, 11, 12, 13, 14, 15];
 
       // Condizioni per un movimento valido del pedone
-      if (
-        // Movimento iniziale di due caselle in avanti
-        (starterRow.includes(startId) && startId + width * 2 === targetId) ||
-        // Movimento di una casella in avanti
-        (startId + width === targetId) ||
-        // Movimento diagonale per catturare un pezzo
+      const isMovingForward = startId + width === targetId;
+      const isInitialMove = starterRow.includes(startId) && startId + width * 2 === targetId;
+      const isCapturing =
         (startId + width - 1 === targetId && document.querySelector(`[square-id="${startId + width - 1}"]`)?.firstChild) ||
-        (startId + width + 1 === targetId && document.querySelector(`[square-id="${startId + width + 1}"]`)?.firstChild)
+        (startId + width + 1 === targetId && document.querySelector(`[square-id="${startId + width + 1}"]`)?.firstChild);
 
+      if (
+        (isInitialMove || isMovingForward) && !document.querySelector(`[square-id="${targetId}"]`)?.firstChild ||
+        isCapturing
       ) {
         return true;
       }
       break;
     }
+
 
     //#: knight
     case 'knight': {
