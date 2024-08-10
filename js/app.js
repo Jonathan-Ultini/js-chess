@@ -119,7 +119,7 @@ function dragDrop(e) {
   if (takenByOpponent && valid) { // Se la casella è occupata dall'avversario e il movimento è valido
     e.target.parentNode.append(draggedElement); // Sposta il pezzo trascinato nella nuova posizione
     e.target.remove(); // Rimuove il pezzo avversario
-    //checkForWin(); // controllo vittoria
+    checkForWin(); // controllo vittoria
     changeplayer(); // Cambia il turno del giocatore
     return;
   }
@@ -131,7 +131,7 @@ function dragDrop(e) {
 
   if (valid) { // Se il movimento è valido e la casella è vuota
     e.target.append(draggedElement); // Sposta il pezzo trascinato nella nuova posizione
-    //checkForWin(); // controllo vittoria
+    checkForWin(); // controllo vittoria
     changeplayer(); // Cambia il turno del giocatore
     return;
   }
@@ -184,10 +184,10 @@ function checkIfValid(target) {
   const pieceColor = draggedElement.firstChild.classList.contains('white') ? 'white' : 'black'; // Determina il colore del pezzo trascinato
 
   // Stampa i dettagli nel console log per il debug
-  console.log('startId', startId);
-  console.log('targetId', targetId);
-  console.log('piece', piece);
-  console.log('pieceColor', pieceColor);
+  //console.log('startId', startId);
+  //console.log('targetId', targetId);
+  //console.log('piece', piece);
+  //console.log('pieceColor', pieceColor);
 
   // Verifica la validità del movimento in base al tipo di pezzo
   switch (piece) {
@@ -416,46 +416,54 @@ function checkIfValid(target) {
 
 //#: funzione per il controllo della vittoria
 function checkForWin() {
-  // Trova tutti gli elementi con l'ID 'king'
   const kings = Array.from(document.querySelectorAll('[id^="king"]'));
 
-  // Debug: stampa l'elenco dei re trovati
-  console.log(kings);
-
-  // Verifica se uno dei re è stato catturato
-  const whiteKing = kings.find(king => king.classList.contains('white'));
-  const blackKing = kings.find(king => king.classList.contains('black'));
+  const whiteKing = kings.find(king => king.firstChild.classList.contains('white'));
+  const blackKing = kings.find(king => king.firstChild.classList.contains('black'));
 
   if (!whiteKing) {
-    // Il re bianco è stato catturato, i neri vincono
+    // Il re bianco è stato catturato
     console.log("Black wins!");
     alert("Black wins!");
-    disableAllMoves(); // Disabilita tutti i movimenti
+    disableAllMoves();
+    return;
   } else if (!blackKing) {
-    // Il re nero è stato catturato, i bianchi vincono
+    // Il re nero è stato catturato
     console.log("White wins!");
     alert("White wins!");
-    disableAllMoves(); // Disabilita tutti i movimenti
-  } else {
-    // Entrambi i re sono ancora in gioco, controlla lo scacco matto
-    const isWhiteKingInCheckMate = isCheckMate(whiteKing);
-    const isBlackKingInCheckMate = isCheckMate(blackKing);
+    disableAllMoves();
+    return;
+  }
 
-    if (isWhiteKingInCheckMate) {
-      console.log("Black wins by checkmate!");
-      alert("Black wins by checkmate!");
-      disableAllMoves(); // Disabilita tutti i movimenti
-    } else if (isBlackKingInCheckMate) {
-      console.log("White wins by checkmate!");
-      alert("White wins by checkmate!");
-      disableAllMoves(); // Disabilita tutti i movimenti
+  // Entrambi i re sono ancora in gioco, verifica se uno è sotto scacco
+  const whiteKingInCheck = isKingInCheck(whiteKing);
+  const blackKingInCheck = isKingInCheck(blackKing);
+
+  if (whiteKingInCheck) {
+    if (isCheckmate(whiteKing)) {
+      console.log("Checkmate! Black wins!");
+      alert("Checkmate! Black wins!");
+      disableAllMoves();
     } else {
-      console.log("Game continues, both kings are present and neither is in checkmate.");
+      console.log("White King is in check!");
+      alert("White King is in check!");
+    }
+  }
+
+  if (blackKingInCheck) {
+    if (isCheckmate(blackKing)) {
+      console.log("Checkmate! White wins!");
+      alert("Checkmate! White wins!");
+      disableAllMoves();
+    } else {
+      console.log("Black King is in check!");
+      alert("Black King is in check!");
     }
   }
 }
 
-// Funzione per disabilitare tutti i movimenti
+
+//#: Funzione per disabilitare tutti i movimenti
 function disableAllMoves() {
   // Supponendo che tu abbia event listeners per i pezzi, puoi rimuoverli
   const allSquares = document.querySelectorAll('.square');
@@ -467,29 +475,77 @@ function disableAllMoves() {
 
 }
 
-// Funzione per verificare lo scacco matto
-function isCheckMate(kingElement) {
-  // Supponendo che tu abbia una funzione che verifica se il re è sotto scacco
-  const isInCheck = isInCheck(kingElement);
+//#: Funzione per controllare se un re è sotto scacco
+function isKingInCheck(king) {
+  const kingPosition = king.parentElement.dataset.position;
+  const pieceColor = king.firstChild.classList.contains('white') ? 'white' : 'black';
 
-  if (!isInCheck) return false;
+  // Trova tutti i pezzi avversari
+  const opponentPieces = Array.from(document.querySelectorAll(`.piece:not(.${pieceColor})`));
 
-  // Trova tutte le possibili mosse per il re
-  const kingId = parseInt(kingElement.parentElement.getAttribute('square-id'));
-  const possibleMoves = getPossibleMovesForKing(kingId);
+  // Controlla se qualche pezzo avversario può attaccare la posizione del re
+  return opponentPieces.some(piece => {
+    const piecePosition = piece.parentElement.dataset.position;
+    const possibleMoves = getPossibleMoves(piece, piecePosition);
 
-  // Controlla se tutte le mosse portano ancora lo scacco
-  return possibleMoves.every(move => isMoveUnderAttack(move));
+    return possibleMoves.includes(kingPosition);
+  });
 }
 
-// Funzione per controllare se un movimento è sotto attacco
-function isMoveUnderAttack(move) {
-  // Implementa la logica per controllare se la casella di destinazione è sotto attacco
+//#: Funzione per ottenere tutte le mosse possibili di un pezzo
+function getPossibleMoves(piece, startId) {
+  // A seconda del tipo di pezzo, questa funzione dovrà restituire le mosse valide
+  switch (piece.getAttribute('type')) {
+    case 'pawn':
+      return getPawnPossibleMoves(startId);
+    case 'rook':
+      return getRookPossibleMoves(startId);
+    case 'bishop':
+      return getBishopPossibleMoves(startId);
+    case 'queen':
+      return getQueenPossibleMoves(startId);
+    case 'king':
+      return getKingPossibleMoves(startId);
+    case 'knight':
+      return getKnightPossibleMoves(startId);
+    default:
+      return [];
+  }
 }
 
-// Funzione per ottenere le possibili mosse per il re
-function getPossibleMovesForKing(kingId) {
-  // Implementa la logica per ottenere tutte le possibili mosse per il re
+
+// Funzione di supporto per ottenere tutte le mosse possibili di un pezzo
+function getKingPossibleMoves(startId) {
+  const moves = [];
+  const startRow = Math.floor(startId / width);
+  const startCol = startId % width;
+
+  const directions = [
+    [0, 1],  // Destra
+    [0, -1], // Sinistra
+    [1, 0],  // Giù
+    [-1, 0], // Su
+    [1, 1],  // Diagonale giù-destra
+    [-1, -1],// Diagonale su-sinistra
+    [1, -1], // Diagonale giù-sinistra
+    [-1, 1]  // Diagonale su-destra
+  ];
+
+  directions.forEach(([rowChange, colChange]) => {
+    const newRow = startRow + rowChange;
+    const newCol = startCol + colChange;
+    const newId = newRow * width + newCol;
+
+    if (newRow >= 0 && newRow < width && newCol >= 0 && newCol < width) {
+      const targetSquare = document.querySelector(`[data-position="${newId}"]`);
+      if (targetSquare) {
+        const targetPiece = targetSquare.firstChild;
+        if (!targetPiece || targetPiece.getAttribute('color') !== pieceColor) {
+          moves.push(newId);
+        }
+      }
+    }
+  });
+
+  return moves;
 }
-
-
