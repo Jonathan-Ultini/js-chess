@@ -435,31 +435,6 @@ function checkForWin() {
     return;
   }
 
-  // Entrambi i re sono ancora in gioco, verifica se uno è sotto scacco
-  const whiteKingInCheck = isKingInCheck(whiteKing);
-  const blackKingInCheck = isKingInCheck(blackKing);
-
-  if (whiteKingInCheck) {
-    if (isCheckmate(whiteKing)) {
-      console.log("Checkmate! Black wins!");
-      alert("Checkmate! Black wins!");
-      disableAllMoves();
-    } else {
-      console.log("White King is in check!");
-      alert("White King is in check!");
-    }
-  }
-
-  if (blackKingInCheck) {
-    if (isCheckmate(blackKing)) {
-      console.log("Checkmate! White wins!");
-      alert("Checkmate! White wins!");
-      disableAllMoves();
-    } else {
-      console.log("Black King is in check!");
-      alert("Black King is in check!");
-    }
-  }
 }
 
 
@@ -475,77 +450,4 @@ function disableAllMoves() {
 
 }
 
-//#: Funzione per controllare se un re è sotto scacco
-function isKingInCheck(king) {
-  const kingPosition = king.parentElement.dataset.position;
-  const pieceColor = king.firstChild.classList.contains('white') ? 'white' : 'black';
 
-  // Trova tutti i pezzi avversari
-  const opponentPieces = Array.from(document.querySelectorAll(`.piece:not(.${pieceColor})`));
-
-  // Controlla se qualche pezzo avversario può attaccare la posizione del re
-  return opponentPieces.some(piece => {
-    const piecePosition = piece.parentElement.dataset.position;
-    const possibleMoves = getPossibleMoves(piece, piecePosition);
-
-    return possibleMoves.includes(kingPosition);
-  });
-}
-
-//#: Funzione per ottenere tutte le mosse possibili di un pezzo
-function getPossibleMoves(piece, startId) {
-  // A seconda del tipo di pezzo, questa funzione dovrà restituire le mosse valide
-  switch (piece.getAttribute('type')) {
-    case 'pawn':
-      return getPawnPossibleMoves(startId);
-    case 'rook':
-      return getRookPossibleMoves(startId);
-    case 'bishop':
-      return getBishopPossibleMoves(startId);
-    case 'queen':
-      return getQueenPossibleMoves(startId);
-    case 'king':
-      return getKingPossibleMoves(startId);
-    case 'knight':
-      return getKnightPossibleMoves(startId);
-    default:
-      return [];
-  }
-}
-
-
-// Funzione di supporto per ottenere tutte le mosse possibili di un pezzo
-function getKingPossibleMoves(startId) {
-  const moves = [];
-  const startRow = Math.floor(startId / width);
-  const startCol = startId % width;
-
-  const directions = [
-    [0, 1],  // Destra
-    [0, -1], // Sinistra
-    [1, 0],  // Giù
-    [-1, 0], // Su
-    [1, 1],  // Diagonale giù-destra
-    [-1, -1],// Diagonale su-sinistra
-    [1, -1], // Diagonale giù-sinistra
-    [-1, 1]  // Diagonale su-destra
-  ];
-
-  directions.forEach(([rowChange, colChange]) => {
-    const newRow = startRow + rowChange;
-    const newCol = startCol + colChange;
-    const newId = newRow * width + newCol;
-
-    if (newRow >= 0 && newRow < width && newCol >= 0 && newCol < width) {
-      const targetSquare = document.querySelector(`[data-position="${newId}"]`);
-      if (targetSquare) {
-        const targetPiece = targetSquare.firstChild;
-        if (!targetPiece || targetPiece.getAttribute('color') !== pieceColor) {
-          moves.push(newId);
-        }
-      }
-    }
-  });
-
-  return moves;
-}
